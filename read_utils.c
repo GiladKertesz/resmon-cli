@@ -80,34 +80,26 @@ int PrintCpuDelta() {
         return 1;
     }
 
-    for (int i = 0; i < 10; i++) {
-        sleep(1);
+    sleep(1);
 
-        // Second snapshot
-        if (read_cpu_snapshot(&after) < 0) {
-            fprintf(stderr, "Failed to read updated CPU stats.\n");
-            return 1;
+    // Second snapshot
+    if (read_cpu_snapshot(&after) < 0) {
+        fprintf(stderr, "Failed to read updated CPU stats.\n");
+        return 1;
+    }
+    
+    // Compute totals
+    unsigned long total_before = before.user + before.nice + before.system + before.idle + before.iowait + before.irq + before.softirq;
+    unsigned long total_after = after.user + after.nice + after.system + after.idle + after.iowait + after.irq + after.softirq;
+    unsigned long delta_total = total_after - total_before;
+    unsigned long delta_idle = after.idle - before.idle;
+    if (delta_total > 0 ) {
+        double usage = 100.0 * (delta_total - delta_idle) / delta_total;
+        printf("\rCPU Usage: %.2f%%", usage);
+        fflush(stdout);
         }
-
-        // Compute totals
-        unsigned long total_before = before.user + before.nice + before.system +
-                                     before.idle + before.iowait + before.irq + before.softirq;
-
-        unsigned long total_after = after.user + after.nice + after.system +
-                                    after.idle + after.iowait + after.irq + after.softirq;
-
-        unsigned long delta_total = total_after - total_before;
-        unsigned long delta_idle = after.idle - before.idle;
-
-        if (delta_total > 0) {
-            double usage = 100.0 * (delta_total - delta_idle) / delta_total;
-            printf("\rCPU Usage: %.2f%%", usage);
-            fflush(stdout);
-        }
-
-
-        // Move 'after' into 'before' for next loop iteration
-        before = after;
+    else {
+        fprintf(stderr, "Failed to find delta in CPU usage in proc/stats over time.\n");
     }
     printf("\n");
     return 0;
@@ -128,7 +120,7 @@ void PrintRamStats() {
     unsigned long memTotal = 0;
     unsigned long memAvailable = 0;
 
-    while (fgets(line, sizeof(line), memFile)) {
+    while (safe_fgets(line, sizeof(line), memFile)) {
         if (sscanf(line, "%63s %lu", label, &valueKB) == 2) {
             if (strcmp(label, "MemTotal:") == 0) {
                 memTotal = valueKB;
@@ -151,9 +143,4 @@ void PrintRamStats() {
     printf("Used:       %4lu MB\n", (memTotal - memAvailable) / 1024);
 }
 
-int main() {
-    PrintCpuStats();
-    PrintRamStats();
-    int check = PrintCpuDelta();
-    return 0;
-}
+
