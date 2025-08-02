@@ -96,7 +96,6 @@ int PrintCpuDelta() {
     if (delta_total > 0 ) {
         double usage = 100.0 * (delta_total - delta_idle) / delta_total;
         printf("\rCPU Usage: %.2f%%", usage);
-        fflush(stdout);
         }
     else {
         fprintf(stderr, "Failed to find delta in CPU usage in proc/stats over time.\n");
