@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     parse_args(argc, argv, &config);
     while (config.loop){
         clear_screen();
-        call_funcs(config);        
+        call_funcs(config);    
         sleep(config.interval);
     }
     call_funcs(config);

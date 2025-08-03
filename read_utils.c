@@ -64,7 +64,7 @@ void PrintCpuStats() {
         if (strncmp(line, "cpu", 3) != 0) {
             break; // Done reading CPU lines
         }
-        int parseret = sscanf(line, "%5s %lu %lu %lu %lu %lu %lu %lu", cpuname, &user, &nice, &system, &idle, &iowait, &irq, &softirq);
+        sscanf(line, "%5s %lu %lu %lu %lu %lu %lu %lu", cpuname, &user, &nice, &system, &idle, &iowait, &irq, &softirq);
         printf("%-7s | %6lu | %6lu | %6lu | %6lu | %6lu | %5lu | %7lu \n", cpuname, user, nice, system, idle, iowait, irq, softirq); // TODO: Parse and format fields individually later
     }
 

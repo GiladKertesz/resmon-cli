@@ -23,8 +23,23 @@ void parse_args(int argc, char *argv[], Config *config) {
             config->show_ram = 1;
         } else if (strcmp(argv[i], "--interval") == 0 && i + 1 < argc) {
             config->interval = atoi(argv[++i]);
+            if (config->interval <= 0) {
+                fprintf(stderr, "Invalid interval: %s\n", argv[i]);
+                exit(1);
+            }
+        } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+            printf("Usage: resmon-cli [options]\n");
+            printf("Options:\n");
+            printf("  --cpu            Show CPU statistics\n");
+            printf("  --ram            Show RAM statistics\n");
+            printf("  --loop           Continuously refresh output\n");
+            printf("  --once           Run only once (default)\n");
+            printf("  --interval <n>   Set refresh interval in seconds (default: 1)\n");
+            printf("  --help, -h       Show this help message and exit\n");
+            exit(0);
         } else {
             fprintf(stderr, "Unknown argument: %s\n", argv[i]);
+            exit(1);
         }
     }
 
